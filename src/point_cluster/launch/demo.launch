@@ -4,9 +4,25 @@
 <rosparam command="load" file="$(find point_cluster)/config/params.yaml" />
 <node name="rviz" pkg="rviz" type="rviz" args="-d $(find point_cluster)/rviz/demo.rviz"/>
 <node name="$(anon demo)" pkg="point_cluster" type="demo" output="screen">
-
 <rosparam param="/cloud_topic">"/livox_full_cloud"</rosparam>
-
 </node>
+<arg name="use_vector_map" default="false" />
+
+  <group if="$(arg use_vector_map)">
+
+    <node pkg="detected_objects_visualizer" type="visualize_detected_objects" name="cluster_detect_visualization_01"
+          output="screen" ns="/detection/lidar_detector">
+      <param name="objects_src_topic" value="/objects_filtered"/>
+    </node>
+  </group>
+  <group unless="$(arg use_vector_map)">
+    <node pkg="detected_objects_visualizer" type="visualize_detected_objects" name="cluster_detect_visualization_01"
+          output="screen" ns="/detection/lidar_detector">
+      <param name="objects_src_topic" value="/objects"/>
+    </node>
+  </group>
+
+
+
 
 </launch>

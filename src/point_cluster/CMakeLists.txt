@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
         rospy
         std_msgs
         roslaunch
+        autoware_msgs
         # cv_bridge    //开启这个会造成opencv的冲突
         pcl_conversions
         pcl_ros
@@ -21,8 +22,12 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         message_generation
         visualization_msgs
-        common_lib
-        object_builders_lib
+        # common_lib
+        # object_builders_lib
+        grid_map_ros
+        grid_map_cv
+        grid_map_msgs
+        jsk_rviz_plugins
         jsk_recognition_msgs
 )
 
@@ -54,10 +59,12 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PCL_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
+        ../common_lib/include/
+        ../object_builders_lib/include/
         include
 )
 
-add_executable(demo src/demo.cpp src/clip.cpp src/CVC.cpp src/CVC_cluster.cpp)
-target_link_libraries(demo ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
+add_executable(demo src/demo.cpp src/clip.cpp src/CVC/CVC.cpp src/CVC/CVC_cluster.cpp src/detect_object.cpp)
+target_link_libraries(demo ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} common_lib object_builders_lib)
 # add_dependencies(demo patchworkpp_generate_messages_cpp)
 

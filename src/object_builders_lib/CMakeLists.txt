@@ -61,6 +61,7 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
     ${Eigen3_INCLUDE_DIRS}
+    ../common_lib/include/
 )
 
 ## Declare a C++ executable
@@ -77,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${Eigen3_LIBRARIES}
+    common_lib
 )
 
 #############
