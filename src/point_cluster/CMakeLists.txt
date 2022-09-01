@@ -24,9 +24,9 @@ find_package(catkin REQUIRED COMPONENTS
         visualization_msgs
         # common_lib
         # object_builders_lib
-        grid_map_ros
-        grid_map_cv
-        grid_map_msgs
+        # grid_map_ros
+        # grid_map_cv               //注释掉避免在xavier编译时与pcl1.8的kdtree_flannch
+        # grid_map_msgs
         jsk_rviz_plugins
         jsk_recognition_msgs
 )

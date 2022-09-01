@@ -370,7 +370,7 @@ void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
     transform.rotate(Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitX())); //同理，UnitX(),绕X轴；UnitY(),绕Y轴
     pcl::transformPointCloud(pc_curr, transformed_cloud, transform);
 
-    clock_t start = clock();
+    double start = ros::Time::now().toSec();
 
     clip.Process(transformed_cloud, clipped_cloud); //删除多余的点
 
@@ -606,10 +606,10 @@ void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
     pub_cloud.publish(cloud2msg(transformed_cloud));
     pub_ground.publish(cloud2msg(pc_ground));
     pub_non_ground.publish(cloud2msg(pc_non_ground));
-    clock_t end = clock();
-    ROS_INFO("Total time: %lf  s", (double)(end - start) / CLOCKS_PER_SEC);
+    double end = ros::Time::now().toSec();
+    ROS_INFO("Total time: %lf  s", (end - start) );
 
-    ROS_INFO("FPS: %lf  Hz", (double)CLOCKS_PER_SEC / (end - start));
+    ROS_INFO("FPS: %lf  Hz", (double)1 / (end - start));
 }
 
 int main(int argc, char **argv)
