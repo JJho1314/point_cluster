@@ -1,8 +1,11 @@
 save_flag: true
 
+# /cloud_topic: "/livox_full_cloud"
+/cloud_topic: "/rslidar_points"
+
 patchworkpp:
     
-    sensor_height: 1.323
+    sensor_height: 1.734
 
     mode: "czm" 
     verbose: false   # To check effect of uprightness/elevation/flatness

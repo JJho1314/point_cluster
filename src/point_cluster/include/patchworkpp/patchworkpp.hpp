@@ -79,7 +79,7 @@ public:
         node_handle_.param("/patchworkpp/th_dist", th_dist_, 0.3);
         node_handle_.param("/patchworkpp/th_seeds_v", th_seeds_v_, 0.4);
         node_handle_.param("/patchworkpp/th_dist_v", th_dist_v_, 0.3);
-        node_handle_.param("/patchworkpp/max_r", max_range_, 50.0);
+        node_handle_.param("/patchworkpp/max_r", max_range_, 100.0);
         node_handle_.param("/patchworkpp/min_r", min_range_, 2.0);
         node_handle_.param("/patchworkpp/uprightness_thr", uprightness_thr_, 0.5);
         node_handle_.param("/patchworkpp/adaptive_seed_selection_margin", adaptive_seed_selection_margin_, -1.1);

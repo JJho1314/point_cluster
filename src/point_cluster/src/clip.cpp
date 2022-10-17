@@ -13,10 +13,10 @@
 
 Clip::Clip(ros::NodeHandle &nh, ros::NodeHandle &private_nh)
 {
-    private_nh.param<float>("min_x", min_x, -30.0);
-    private_nh.param<float>("max_x", max_x, 150.0);
-    private_nh.param<float>("min_y", min_y, -30.0);
-    private_nh.param<float>("max_y", max_y, 30.0);
+    private_nh.param<float>("min_x", min_x, -50.0);
+    private_nh.param<float>("max_x", max_x,  50.0);
+    private_nh.param<float>("min_y", min_y, -50.0);
+    private_nh.param<float>("max_y", max_y, 50.0);
     private_nh.param<float>("min_z", min_z, -2.2);
     private_nh.param<float>("max_z", max_z, 1.5);
     private_nh.param<float>("min_base_x", min_base_x, -2.0);

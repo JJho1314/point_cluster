@@ -56,7 +56,7 @@ ros::Publisher pub_centroid;
 ros::Publisher pub_clusters_message;
 
 template <typename T>
-sensor_msgs::PointCloud2 cloud2msg(pcl::PointCloud<T> cloud, std::string frame_id = "livox_frame")
+sensor_msgs::PointCloud2 cloud2msg(pcl::PointCloud<T> cloud, std::string frame_id = "/velodyne")
 {
     sensor_msgs::PointCloud2 cloud_ROS;
     pcl::toROSMsg(cloud, cloud_ROS);
@@ -266,7 +266,6 @@ void publishCloudClusters(const ros::Publisher *in_publisher, const autoware_msg
                                                     cluster_transformed.avg_point);
                 _transform_listener->transformPoint(in_target_frame, ros::Time(), i->centroid_point, in_header.frame_id,
                                                     cluster_transformed.centroid_point);
-
                 cluster_transformed.dimensions = i->dimensions;
                 cluster_transformed.eigen_values = i->eigen_values;
                 cluster_transformed.eigen_vectors = i->eigen_vectors;
@@ -351,8 +350,8 @@ void publishColorCloud(const ros::Publisher *in_publisher,
 void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
 {
     double time_taken;
-    float theta = -M_PI / 38; // 旋转弧度s
-    // float theta = 0; // 旋转弧度s
+    // float theta = -M_PI / 38; // 旋转弧度s
+    float theta = 0; // 旋转弧度s
 
     pcl::PointCloud<PointType> pc_curr;
     pcl::PointCloud<PointType> pc_ground;
@@ -368,6 +367,7 @@ void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
     _velodyne_header = cloud_msg->header;
 
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+    // transform.translation() << 0.0, 0.0, 2.0;
     transform.rotate(Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitX())); //同理，UnitX(),绕X轴；UnitY(),绕Y轴
     pcl::transformPointCloud(pc_curr, transformed_cloud, transform);
 
@@ -378,7 +378,7 @@ void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
     PatchworkppGroundSeg->estimate_ground(clipped_cloud, pc_ground, pc_non_ground, time_taken);
 
     cout << "\033[1;32m"
-         << "Result: Input PointCloud: " << clipped_cloud.size() << " -> Ground: " << clipped_cloud.size()
+         << "Result: Input PointCloud: " << clipped_cloud.size() << " -> Ground: " << pc_ground.size()
          << " (running_time: " << time_taken << " sec)"
          << "\033[0m" << endl;
 
@@ -623,7 +623,7 @@ int main(int argc, char **argv)
 
     std::string cloud_topic;
     nh.param<string>("/cloud_topic", cloud_topic, "/pointcloud");
-    _output_frame = "livox_frame";
+    _output_frame = "/velodyne";
 
     std::cout << "Operating patchwork++..." << std::endl;
     PatchworkppGroundSeg.reset(new PatchWorkpp<PointType>(&nh));
