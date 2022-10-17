@@ -14,7 +14,7 @@
 Clip::Clip(ros::NodeHandle &nh, ros::NodeHandle &private_nh)
 {
     private_nh.param<float>("min_x", min_x, -30.0);
-    private_nh.param<float>("max_x", max_x, 120.0);
+    private_nh.param<float>("max_x", max_x, 150.0);
     private_nh.param<float>("min_y", min_y, -30.0);
     private_nh.param<float>("max_y", max_y, 30.0);
     private_nh.param<float>("min_z", min_z, -2.2);
@@ -23,8 +23,8 @@ Clip::Clip(ros::NodeHandle &nh, ros::NodeHandle &private_nh)
     private_nh.param<float>("max_base_x", max_base_x, 2.0);
     private_nh.param<float>("min_base_y", min_base_y, -1.0);
     private_nh.param<float>("max_base_y", max_base_y, 1.0);
-    private_nh.param<float>("min_base_z", min_base_z, -2.2);
-    private_nh.param<float>("max_base_z", max_base_z, 0.05);
+    private_nh.param<float>("min_base_z", min_base_z, -0.0);
+    private_nh.param<float>("max_base_z", max_base_z, 0.0);
 }
 
 void Clip::Process(const pcl::PointCloud<pcl::PointXYZ> &in_cloud, pcl::PointCloud<pcl::PointXYZ> &out_cloud)

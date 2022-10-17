@@ -352,6 +352,7 @@ void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
 {
     double time_taken;
     float theta = -M_PI / 38; // 旋转弧度s
+    // float theta = 0; // 旋转弧度s
 
     pcl::PointCloud<PointType> pc_curr;
     pcl::PointCloud<PointType> pc_ground;
@@ -607,7 +608,7 @@ void callbackCloud(const sensor_msgs::PointCloud2::Ptr &cloud_msg)
     pub_ground.publish(cloud2msg(pc_ground));
     pub_non_ground.publish(cloud2msg(pc_non_ground));
     double end = ros::Time::now().toSec();
-    ROS_INFO("Total time: %lf  s", (end - start) );
+    ROS_INFO("Total time: %lf  s", (end - start));
 
     ROS_INFO("FPS: %lf  Hz", (double)1 / (end - start));
 }

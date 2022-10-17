@@ -18,9 +18,9 @@ class Clip
 private:
     //设置三个方向上最大最小检测范围
     float min_x = -30.0;
-    float max_x = 50.0;
-    float min_y = -15.0;
-    float max_y = 15.0;
+    float max_x = 150.0;
+    float min_y = -30.0;
+    float max_y = 30.0;
     float min_z = -2.2;
     float max_z = 0.1;
 

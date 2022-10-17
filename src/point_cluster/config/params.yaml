@@ -2,7 +2,7 @@ save_flag: true
 
 patchworkpp:
     
-    sensor_height: 1.723
+    sensor_height: 1.323
 
     mode: "czm" 
     verbose: false   # To check effect of uprightness/elevation/flatness
@@ -17,7 +17,7 @@ patchworkpp:
     th_seeds_v: 0.25
     th_dist_v: 0.1
     max_r: 120.0
-    min_r: 2.7 # to consider vicinity of mobile platform.
+    min_r: 2.0 # to consider vicinity of mobile platform.
     uprightness_thr: 0.707 # 45: 0.707 / 60: 0.866
 
     adaptive_seed_selection_margin: -1.2 # The points below the adaptive_seed_selection_margin * sensor_height are filtered

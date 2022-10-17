@@ -71,7 +71,7 @@ public:
 
         node_handle_.param("/patchworkpp/verbose", verbose_, false);
 
-        node_handle_.param("/patchworkpp/sensor_height", sensor_height_, 1.723);
+        node_handle_.param("/patchworkpp/sensor_height", sensor_height_, 1.323);
         node_handle_.param("/patchworkpp/num_iter", num_iter_, 3);
         node_handle_.param("/patchworkpp/num_lpr", num_lpr_, 20);
         node_handle_.param("/patchworkpp/num_min_pts", num_min_pts_, 10); 
@@ -79,8 +79,8 @@ public:
         node_handle_.param("/patchworkpp/th_dist", th_dist_, 0.3);
         node_handle_.param("/patchworkpp/th_seeds_v", th_seeds_v_, 0.4);
         node_handle_.param("/patchworkpp/th_dist_v", th_dist_v_, 0.3);
-        node_handle_.param("/patchworkpp/max_r", max_range_, 80.0);
-        node_handle_.param("/patchworkpp/min_r", min_range_, 2.7);
+        node_handle_.param("/patchworkpp/max_r", max_range_, 50.0);
+        node_handle_.param("/patchworkpp/min_r", min_range_, 2.0);
         node_handle_.param("/patchworkpp/uprightness_thr", uprightness_thr_, 0.5);
         node_handle_.param("/patchworkpp/adaptive_seed_selection_margin", adaptive_seed_selection_margin_, -1.1);
         node_handle_.param("/patchworkpp/noise_filter_channel_num", noise_filter_channel_num_, 5);
