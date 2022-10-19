@@ -255,17 +255,17 @@ void publishCloudClusters(const ros::Publisher *in_publisher, const autoware_msg
             cluster_transformed.header = in_header;
             try
             {
-                _transform_listener->lookupTransform(in_target_frame, _velodyne_header.frame_id, ros::Time(),
-                                                     *_transform);
-                pcl_ros::transformPointCloud(in_target_frame, *_transform, i->cloud, cluster_transformed.cloud);
-                _transform_listener->transformPoint(in_target_frame, ros::Time(), i->min_point, in_header.frame_id,
-                                                    cluster_transformed.min_point);
-                _transform_listener->transformPoint(in_target_frame, ros::Time(), i->max_point, in_header.frame_id,
-                                                    cluster_transformed.max_point);
-                _transform_listener->transformPoint(in_target_frame, ros::Time(), i->avg_point, in_header.frame_id,
-                                                    cluster_transformed.avg_point);
-                _transform_listener->transformPoint(in_target_frame, ros::Time(), i->centroid_point, in_header.frame_id,
-                                                    cluster_transformed.centroid_point);
+                // _transform_listener->lookupTransform(in_target_frame, _velodyne_header.frame_id, ros::Time(),
+                //                                      *_transform);
+                // pcl_ros::transformPointCloud(in_target_frame, *_transform, i->cloud, cluster_transformed.cloud);
+                // _transform_listener->transformPoint(in_target_frame, ros::Time(), i->min_point, in_header.frame_id,
+                //                                     cluster_transformed.min_point);
+                // _transform_listener->transformPoint(in_target_frame, ros::Time(), i->max_point, in_header.frame_id,
+                //                                     cluster_transformed.max_point);
+                // _transform_listener->transformPoint(in_target_frame, ros::Time(), i->avg_point, in_header.frame_id,
+                //                                     cluster_transformed.avg_point);
+                // _transform_listener->transformPoint(in_target_frame, ros::Time(), i->centroid_point, in_header.frame_id,
+                //                                     cluster_transformed.centroid_point);
 
                 cluster_transformed.dimensions = i->dimensions;
                 cluster_transformed.eigen_values = i->eigen_values;

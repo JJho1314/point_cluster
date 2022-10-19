@@ -1,28 +1,12 @@
 <launch>
 
-<node name="tf" pkg="tf" type="static_transform_publisher" args= "0.0 0.0 0.0 0.0 0.0 0.0 map base_link 100"/>
-<rosparam command="load" file="$(find point_cluster)/config/params.yaml" />
-<node name="rviz" pkg="rviz" type="rviz" args="-d $(find point_cluster)/rviz/demo.rviz"/>
-<node name="$(anon demo)" pkg="point_cluster" type="demo" output="screen">
-<rosparam param="/cloud_topic">"/livox_full_cloud"</rosparam>
-</node>
-<arg name="use_vector_map" default="false" />
+  <node name="tf" pkg="tf" type="static_transform_publisher" args= "0.0 0.0 0.0 0.0 0.0 0.0 map base_link 100"/>
+  <rosparam command="load" file="$(find point_cluster)/config/params.yaml" />
+  <rosparam param="/cloud_topic">"/livox_full_cloud"</rosparam>
 
-  <group if="$(arg use_vector_map)">
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find point_cluster)/rviz/demo.rviz"/>
 
-    <node pkg="detected_objects_visualizer" type="visualize_detected_objects" name="cluster_detect_visualization_01"
-          output="screen" ns="/detection/lidar_detector">
-      <param name="objects_src_topic" value="/objects_filtered"/>
-    </node>
-  </group>
-  <group unless="$(arg use_vector_map)">
-    <node pkg="detected_objects_visualizer" type="visualize_detected_objects" name="cluster_detect_visualization_01"
-          output="screen" ns="/detection/lidar_detector">
-      <param name="objects_src_topic" value="/objects"/>
-    </node>
-  </group>
-
-
-
+  <node pkg="point_cluster" type="demo" name="$(anon demo)" output="screen"/>
+  <node pkg="point_cluster" type="FormatConvert" name="FormatConvert" output="screen"/>
 
 </launch>

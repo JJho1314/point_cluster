@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(catkin REQUIRED COMPONENTS
+        livox_ros_driver
         roscpp
         rospy
         std_msgs
@@ -63,6 +64,9 @@ include_directories(
         ../object_builders_lib/include/
         include
 )
+
+add_executable(FormatConvert src/FormatConvert.cpp)
+target_link_libraries(FormatConvert ${catkin_LIBRARIES})
 
 add_executable(demo src/demo.cpp src/clip.cpp src/CVC/CVC.cpp src/CVC/CVC_cluster.cpp src/detect_object.cpp)
 target_link_libraries(demo ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} common_lib object_builders_lib)
