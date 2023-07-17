@@ -138,12 +138,10 @@ int main()
         cluster_point->points.push_back(p);
     }
 
-    cout << "cluster_point " << cluster_point->points.size() << endl;
     CVC Cluster(param);
     std::vector<PointAPR> capr;
     Cluster.calculateAPR(*cluster_point, capr);
 
-    cout << "capr " << capr.size() << endl;
     std::unordered_map<int, Voxel> hash_table;
     Cluster.build_hash_table(capr, hash_table);
     vector<int> cluster_indices;
@@ -163,7 +161,7 @@ int main()
     int b = rng.uniform(0, 200);
     pcl::visualization::PointCloudColorHandlerCustom<PointType> colorob(pc_ground, (r), (g), (b));
     string csob = "cloudfinalob";
-    // viewer->addPointCloud(pc_ground, colorob, csob);
+    viewer->addPointCloud(pc_ground, colorob, csob);
 
     // pcl::visualization::PointCloudColorHandlerCustom <PointType> colorob2(pc_non_ground, (0), (255),(0));
     // string csob2 = "cloudfinalob1";
