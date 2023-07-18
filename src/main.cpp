@@ -35,6 +35,8 @@
 #include "CVC_cluster.h"
 #include "patchwork.hpp"
 #include "GuassianProcess.h"
+#include "processPointClouds.h"
+#include "SFND/processPointClouds.cpp"
 
 using namespace std;
 using namespace autosense;
@@ -76,7 +78,7 @@ void load_bin_cloud(std::string kitti_filename, pcl::PointCloud<pcl::PointXYZI>:
     free(data); // 释放内存
 }
 
-using PointType = PointXYZILID;
+using PointType = pcl::PointXYZI;
 boost::shared_ptr<PatchWork<PointType>> PatchworkGroundSeg;
 
 int main()
@@ -93,6 +95,7 @@ int main()
     load_bin_cloud(kitti_cloud_filename, point_cloud);
     load_Calibration(kitti_calib_filename);
 
+    // 获取视野范围内的点云
     fov_segmentation(point_cloud, cloud_fov);
 
     /*******************GP INSAC**************************/
@@ -101,8 +104,9 @@ int main()
     // PointICloudPtr cloud_nonground(new PointICloud);
     // segmenter::GP_INSAC(*cloud_fov, *cloud_nonground, *cloud_ground);
 
-    /****************    CVC    **************************/
-    PatchworkGroundSeg.reset(new PatchWork<PointXYZILID>());
+    /**************** CVC的地面分割  **********************/
+    PatchworkGroundSeg.reset(new PatchWork<PointType>());
+    ProcessPointClouds<pcl::PointXYZ> *pointProcessorI = new ProcessPointClouds<pcl::PointXYZ>();
     pcl::PointCloud<PointType>::Ptr pc_curr(new pcl::PointCloud<PointType>);
     pcl::PointCloud<PointType>::Ptr pc_ground(new pcl::PointCloud<PointType>);
     pcl::PointCloud<PointType>::Ptr pc_non_ground(new pcl::PointCloud<PointType>);
@@ -120,12 +124,12 @@ int main()
 
     PatchworkGroundSeg->estimate_ground(*pc_curr, *pc_ground, *pc_non_ground, time_taken);
 
-    cout << time_taken << endl;
+    /****************    CVC聚类    **************************/
 
     vector<float> param(3, 0);
-    param[0] = 2;
-    param[1] = 0.4;
-    param[2] = 1.5;
+    param[0] = 3;
+    param[1] = 1.0;
+    param[2] = 1.8;
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_point(new pcl::PointCloud<pcl::PointXYZ>);
 
@@ -149,10 +153,40 @@ int main()
     vector<int> cluster_id;
     Cluster.most_frequent_value(cluster_indices, cluster_id);
 
-    boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(
-        new pcl::visualization::PCLVisualizer("pcd")); // PCLVisualizer 可视化类
+    // std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters;
+
+    // for (int j = 0; j < cluster_id.size(); ++j)
+    // {
+    //     pcl::PointCloud<pcl::PointXYZ>::Ptr cloudcluster(new pcl::PointCloud<pcl::PointXYZ>); // 初始化
+    //     for (int i = 0; i < cluster_indices.size(); ++i)
+    //     {
+    //         if (cluster_indices[i] == cluster_id[j])
+    //         {
+    //             cloudcluster->points.push_back(cluster_point->points[i]);
+    //         }
+    //     }
+    //     cloudClusters.push_back(cloudcluster);
+    // }
+
+    /**************************************    欧式聚类   **********************************************/
+
+    // KdTree *tree = new KdTree;
+
+    // for (int i = 0; i < pc_non_ground->points.size(); i++)
+    //     tree->insert(pc_non_ground->points[i], i);
+
+    // std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->euclideanCluster(pc_non_ground, tree, 0.5, 30, 250);
+
+    /******************    可视化    **************************/
+
+    pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
+    // set camera position and angle
+    viewer->initCameraParameters();
+    viewer->setCameraPosition(-16, -16, 10, 2, 2, 0);
     viewer->setBackgroundColor(0, 0, 0);
     viewer->addCoordinateSystem(1);
+
+    // renderPointCloud(viewer, segmentCloud.second, "planefield", Color(0, 1, 1));
 
     cv::RNG rng(12345);
 
@@ -163,10 +197,14 @@ int main()
     string csob = "cloudfinalob";
     viewer->addPointCloud(pc_ground, colorob, csob);
 
+    /**********************************CVC聚类 可视化*************************************/
+
     // pcl::visualization::PointCloudColorHandlerCustom <PointType> colorob2(pc_non_ground, (0), (255),(0));
     // string csob2 = "cloudfinalob1";
     // viewer->addPointCloud(pc_non_ground,colorob2, csob2);
 
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters;
+    int clusterId = 0;
     for (int j = 0; j < cluster_id.size(); ++j)
     {
         int r = rng.uniform(20, 255);
@@ -180,18 +218,42 @@ int main()
                 cloudcluster->points.push_back(cluster_point->points[i]);
             }
         }
+        cloudClusters.push_back(cloudcluster);
 
-        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color(cloudcluster, (r), (g), (b));
+        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ>
+            color(cloudcluster, (r), (g), (b));
         string text = "cloud" + toString(j);
         viewer->addPointCloud(cloudcluster, color, text);
+        Box box = pointProcessorI->BoundingBox(cloudcluster);
+        renderBox(viewer, box, clusterId);
+        ++clusterId;
     }
 
+    /**********************************欧式聚类 可视化*************************************/
+    // int clusterId = 0;
+    // std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1)};
+
+    // std::cout << "聚类数量： " << cloudClusters.size() << std::endl;
+
+    // for (pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters)
+    // {
+    //     int r = rng.uniform(20, 255);
+    //     int g = rng.uniform(20, 255);
+    //     int b = rng.uniform(20, 255);
+    //     pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color(cluster, (r), (g), (b));
+    //     std::string text = "cloud" + toString(clusterId);
+    //     viewer->addPointCloud(cluster, color, text);
+    //     Box box = pointProcessorI->BoundingBox(cluster);
+    //     renderBox(viewer, box, clusterId);
+    //     ++clusterId;
+    // }
+
+    // 保存Viewer中的内容
+    viewer->saveScreenshot("viewer.png");
     while (!viewer->wasStopped())
     {
         viewer->spin();
     }
-
-    ;
 
     // // 写成PCD格式文件
     // pcl::io::savePCDFileASCII("000000.pcd", *point_cloud);

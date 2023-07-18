@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(point_cloud)
 
-add_compile_options(-std=c++14)
+add_compile_options(-std=c++11)
 set(CMAKE_BUILD_TYPE "Release")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -25,10 +25,14 @@ include_directories(
   ${OpenCV_LIBRARIES}
 )
 
-link_directories(${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES}
+link_directories(${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES})
+
+add_library(processPointClouds SHARED
+    src/SFND/processPointClouds.cpp
+    src/SFND/render.cpp
 )
 
 add_definitions(${PCL_DEFINITIONS})
-add_executable(point_cloud src/main.cpp src/common.cpp src/GuassianProcess.cpp src/CVC_cluster.cpp)
+add_executable(point_cloud src/main.cpp src/common.cpp src/GuassianProcess.cpp src/CVC_cluster.cpp )
 
-target_link_libraries(point_cloud ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES})
+target_link_libraries(point_cloud  processPointClouds ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES})
