@@ -182,7 +182,7 @@ int main()
     pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
     // set camera position and angle
     viewer->initCameraParameters();
-    viewer->setCameraPosition(-16, -16, 10, 2, 2, 0);
+    viewer->setCameraPosition(-16, 0, 10, 2, 0, 2, 0, 0, 1);
     viewer->setBackgroundColor(0, 0, 0);
     viewer->addCoordinateSystem(1);
 
@@ -228,6 +228,8 @@ int main()
         renderBox(viewer, box, clusterId);
         ++clusterId;
     }
+
+    std::cout << "聚类数量： " << cloudClusters.size() << std::endl;
 
     /**********************************欧式聚类 可视化*************************************/
     // int clusterId = 0;
