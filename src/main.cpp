@@ -34,9 +34,10 @@
 #include "common.hpp"
 #include "CVC_cluster.h"
 #include "patchwork.hpp"
+#include "render/render.h"
 #include "GuassianProcess.h"
-#include "processPointClouds.h"
-#include "SFND/processPointClouds.cpp"
+#include "obstacle_detector.hpp"
+#include "box_fitting.h"
 
 using namespace std;
 using namespace autosense;
@@ -106,7 +107,6 @@ int main()
 
     /**************** CVC的地面分割  **********************/
     PatchworkGroundSeg.reset(new PatchWork<PointType>());
-    ProcessPointClouds<pcl::PointXYZ> *pointProcessorI = new ProcessPointClouds<pcl::PointXYZ>();
     pcl::PointCloud<PointType>::Ptr pc_curr(new pcl::PointCloud<PointType>);
     pcl::PointCloud<PointType>::Ptr pc_ground(new pcl::PointCloud<PointType>);
     pcl::PointCloud<PointType>::Ptr pc_non_ground(new pcl::PointCloud<PointType>);
@@ -175,8 +175,6 @@ int main()
     // for (int i = 0; i < pc_non_ground->points.size(); i++)
     //     tree->insert(pc_non_ground->points[i], i);
 
-    // std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->euclideanCluster(pc_non_ground, tree, 0.5, 30, 250);
-
     /******************    可视化    **************************/
 
     pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
@@ -202,8 +200,12 @@ int main()
     // pcl::visualization::PointCloudColorHandlerCustom <PointType> colorob2(pc_non_ground, (0), (255),(0));
     // string csob2 = "cloudfinalob1";
     // viewer->addPointCloud(pc_non_ground,colorob2, csob2);
+    std::shared_ptr<ObstacleDetector<pcl::PointXYZ>> obstacle_detector;
+    std::vector<BoxQ> curr_boxes_;
 
-    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters;
+    obstacle_detector = std::make_shared<ObstacleDetector<pcl::PointXYZ>>();
+
+    std::vector<pcl::PointCloud<pcl::PointXYZ>> cloudClusters;
     int clusterId = 0;
     for (int j = 0; j < cluster_id.size(); ++j)
     {
@@ -218,37 +220,43 @@ int main()
                 cloudcluster->points.push_back(cluster_point->points[i]);
             }
         }
-        cloudClusters.push_back(cloudcluster);
+        cloudClusters.emplace_back(*cloudcluster);
 
         pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ>
             color(cloudcluster, (r), (g), (b));
         string text = "cloud" + toString(j);
         viewer->addPointCloud(cloudcluster, color, text);
-        Box box = pointProcessorI->BoundingBox(cloudcluster);
-        renderBox(viewer, box, clusterId);
+
+        // Create Bounding Boxes
+        Box box = obstacle_detector->axisAlignedBoundingBox(cloudcluster, clusterId);
+
+        BoxQ boxQ;
+
+        boxQ.bboxQuaternion = box.quaternion;
+        boxQ.bboxTransform = box.position;
+        boxQ.cube_height = box.dimension(2);
+        boxQ.cube_length = box.dimension(0);
+        boxQ.cube_width = box.dimension(1);
+
+        curr_boxes_.emplace_back(boxQ);
+
+        // renderBox(viewer, boxQ, clusterId);
         ++clusterId;
     }
 
+    // renderBox(viewer, curr_boxes_);
+
+    std::vector<pcl::PointCloud<pcl::PointXYZ>> bbPoints;
+
+    std::vector<BoxQ> boxesQ;
+
+    getBoundingBox(cloudClusters, bbPoints);
+
+    calculateBoundingBoxes(bbPoints, boxesQ);
+
+    renderBox(viewer, boxesQ);
+
     std::cout << "聚类数量： " << cloudClusters.size() << std::endl;
-
-    /**********************************欧式聚类 可视化*************************************/
-    // int clusterId = 0;
-    // std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1)};
-
-    // std::cout << "聚类数量： " << cloudClusters.size() << std::endl;
-
-    // for (pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters)
-    // {
-    //     int r = rng.uniform(20, 255);
-    //     int g = rng.uniform(20, 255);
-    //     int b = rng.uniform(20, 255);
-    //     pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color(cluster, (r), (g), (b));
-    //     std::string text = "cloud" + toString(clusterId);
-    //     viewer->addPointCloud(cluster, color, text);
-    //     Box box = pointProcessorI->BoundingBox(cluster);
-    //     renderBox(viewer, box, clusterId);
-    //     ++clusterId;
-    // }
 
     // 保存Viewer中的内容
     viewer->saveScreenshot("viewer.png");

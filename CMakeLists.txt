@@ -27,12 +27,7 @@ include_directories(
 
 link_directories(${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES})
 
-add_library(processPointClouds SHARED
-    src/SFND/processPointClouds.cpp
-    src/SFND/render.cpp
-)
-
 add_definitions(${PCL_DEFINITIONS})
-add_executable(point_cloud src/main.cpp src/common.cpp src/GuassianProcess.cpp src/CVC_cluster.cpp )
+add_executable(point_cloud src/main.cpp src/common.cpp src/box_Fitting.cpp src/GuassianProcess.cpp src/CVC_cluster.cpp src/render.cpp)
 
-target_link_libraries(point_cloud  processPointClouds ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES})
+target_link_libraries(point_cloud ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${EIGEN3_LIBRARIES})
