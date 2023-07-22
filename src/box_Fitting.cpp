@@ -394,24 +394,30 @@ void calculateBoundingBoxes(const std::vector<pcl::PointCloud<pcl::PointXYZ>> &b
         Eigen::Matrix3f eigenvectors = eigenSolver.eigenvectors();
 
         // Take the eigenvector corresponding to the largest eigenvalue as the orientation
-        Eigen::Vector3f orientationVector = eigenvectors.col(2);
+        Eigen::Vector3f orientationVector;
+        if (boxDimensions(2) > boxDimensions(1) && boxDimensions(2) > boxDimensions(0))
+        {
+            orientationVector = eigenvectors.col(0);
+        }
+        else
+        {
+            orientationVector = eigenvectors.col(2);
+        }
 
-        // Ensure that the orientation vector points in the positive z-direction
-        if (orientationVector(2) < 0)
-            orientationVector *= -1;
+        // // Ensure that the orientation vector points in the positive z-direction
+        // if (orientationVector(2) < 0)
+        //     orientationVector *= -1;
 
-        orientation = Eigen::Quaternionf(Eigen::Quaternionf::FromTwoVectors(Eigen::Vector3f::UnitZ(), orientationVector));
+        orientation = Eigen::Quaternionf(Eigen::Quaternionf::FromTwoVectors(Eigen::Vector3f::UnitX(), orientationVector));
 
         Eigen::Vector3f eulerAngle = orientation.matrix().eulerAngles(2, 1, 0);
 
+        std::cout << "roll: " << eulerAngle(2) << " pitch: " << eulerAngle(1) << " yaw: " << eulerAngle(0) << std::endl;
+
         BoxQ bbox;
 
-        Eigen::Quaternionf q = Eigen::AngleAxisf(eulerAngle(0) - M_PI / 2, ::Eigen::Vector3f::UnitZ()) *
-                               Eigen::AngleAxisf(0, ::Eigen::Vector3f::UnitY()) *
-                               Eigen::AngleAxisf(0, ::Eigen::Vector3f::UnitX());
-
         bbox.bboxTransform = center;
-        bbox.bboxQuaternion = q;
+        bbox.bboxQuaternion = orientation;
         bbox.cube_length = boxDimensions(0);
         bbox.cube_width = boxDimensions(1);
         bbox.cube_height = boxDimensions(2);
